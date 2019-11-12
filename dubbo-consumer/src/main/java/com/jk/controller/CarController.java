@@ -20,7 +20,7 @@ public class CarController {
     private CarService carService;
     @RequestMapping("show")
     public String toshow(){
-        return "show";
+        return "show123";
     }
 
     @RequestMapping("queryCarList")
