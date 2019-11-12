@@ -40,6 +40,10 @@ public class CarController {
         return "show";
     }
 
+    @RequestMapping("hahah")
+    public String toHAHAHA(){
+        return "show";
+    }
     @RequestMapping("queryCarList")
     @ResponseBody
     public List<Car> queryCarList(){
