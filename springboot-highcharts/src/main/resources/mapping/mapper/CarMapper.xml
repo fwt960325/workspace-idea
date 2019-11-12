@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.mapper.CarMapper" >
+
+
+  <select id="queryCarList" resultType="com.jk.model.Car">
+    SELECT  * FROM t_car;
+  </select>
+  <select id="queryCar" resultType="java.util.LinkedHashMap">
+       select COUNT(*) y,DATE_FORMAT(carTime,'%Y-%m') time  from t_car GROUP BY DATE_FORMAT(carTime,'%Y-%m')
+  </select>
+  <select id="queryCarAll" resultType="java.util.LinkedHashMap">
+select count(*) count,DATE_FORMAT(carTime,'%u') data  from t_car GROUP BY DATE_FORMAT(cartime,'%u')
+  </select>
+  <select id="queryZhu" resultType="java.util.LinkedHashMap">
+    SELECT DATE_FORMAT(carTime,'%Y-%m-%d') as time,sum(carPrice) counts FROM
+    t_car GROUP BY  time
+   </select>
+
+
+  <select id="querymianji" resultType="java.util.LinkedHashMap">
+        select sum(carPrice) counts,carName from t_car GROUP BY carName
+    </select>
+
+
+</mapper>

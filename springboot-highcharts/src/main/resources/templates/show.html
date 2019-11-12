@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+
+    <!-- 这是jquery的核心包  -->
+    <script type="text/javascript" src="../jquery.min.js"></script>
+    <script src="../highcharts/code/highcharts.js"></script>
+    <script src="../highcharts/code/modules/exporting.js"></script>
+    <script src="../highcharts/code/modules/export-data.js"></script>
+
+</head>
+
+<body>
+
+<div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+<div id="container1" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+<div id="container2" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+
+</body>
+<script>
+    $(function () {
+        $.ajax({
+            url:"../queryCar",
+            type:"post",
+            dataType:"json",
+            success:function (data) {
+                Highcharts.chart('container', {
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: '1905班车辆信息'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b> 月:<b>{point.y}辆</b>'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Brands',
+                        colorByPoint: true,
+                        data: data
+                    }]
+                });
+            },error:function () {
+                alert("查询失败")
+            }
+        })
+
+
+    $.ajax({
+        url:"../queryCarAll",
+        type:"post",
+        dataType:"json",
+        async:true,
+        success:function (data) {
+            var xtext = [];//X轴TEXT
+            var nums = [];//y轴数量
+            for (var i=0;i<data.length;i++){
+
+                nums.push(data[i].count);
+                xtext.push(data[i].time);
+            }
+            var chart = Highcharts.chart('container1', {
+                title: {
+                    text: '每周的车辆销售情况'
+                },
+                yAxis: {
+                    title: {
+                        text: '销售数量'
+                    }
+                },
+
+                xAxis: {
+                    categories: xtext,
+                    crosshair: true
+
+                },
+                series: [{
+                    name:"数据",
+                    data:nums
+                }]
+
+            });
+        }
+    })
+    })
+
+
+
+</script>
+</html>

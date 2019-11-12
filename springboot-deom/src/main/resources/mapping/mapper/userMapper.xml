@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.mapper.UserMapper" >
+
+    <!-- 根据pid查询对应的子节点 -->
+  <select id="queryTreeByid" resultType="com.jk.model.TreeBean">
+    SELECT  *  FROM t_tree where pid = #{pid}
+  </select>
+    <!-- 查询用户表的总条数 -->
+  <select id="queryCount" resultType="int">
+        select count(1) from t_user u
+  </select>
+    <!-- 分页查询用户信息 -->
+  <select id="queryUserPage" resultType="com.jk.model.UserBean">
+    	select u.*,d.text deptName, a1.name proName,a2.name cityName,group_concat(r.name) roleName from t_user u
+	        left join t_dept d on u.deptid = d.id
+	        left join t_area a1 on u.province = a1.id
+	        left join t_area a2 on u.city = a2.id
+	        left join t_user_role ur on u.id = ur.userid
+	        left join t_role r on r.id = ur.roleid
+	        group by u.id
+	        limit #{start},#{rows}
+  </select>
+    <!-- 查询所有的角色 -->
+    <select id="queryRole" resultType="com.jk.model.RoleBean">
+        select * from t_role
+    </select>
+
+    <select id="queryMenu" resultType="com.jk.model.MenuBean" parameterType="int">
+        select * from t_power_menu where powerid=#{powerid}
+    </select>
+
+    <!-- 根据角色id查询对应的权限 -->
+    <select id="queryPowerTreeByRoleid" parameterType="int" resultType="com.jk.model.TreeBean">
+        select n.id,n.text,n.url,n.pid from t_tree n left join t_role_power rp on n.id = rp.powerid
+			where rp.roleid=#{roleid}
+    </select>
+
+    <select id="queryTreeByPid" parameterType="int" resultType="com.jk.model.TreeBean">
+        select t.id,t.text,t.pid,t.url from t_tree t where t.pid=#{pid}
+    </select>
+    <select id="addPower" parameterType="com.jk.model.TreeBean">
+        insert into t_tree(text,url,pid) values(#{text},#{url},#{pid})
+    </select>
+    <delete id="deletePowerById" parameterType="int">
+        delete from t_tree where id = #{powerid}
+    </delete>
+    <delete id="deleteByRoleid" parameterType="int">
+        delete from t_role_power where roleid=#{roleid}
+    </delete>
+    <insert id="addRolePower">
+        insert into t_role_power(roleid,powerid) values
+        <foreach collection="ids" item="powerid" separator=",">
+            (#{roleid},#{powerid})
+        </foreach>
+    </insert>
+    <select id="queryUserName" parameterType="string" resultType="com.jk.model.UserBean">
+        	select * from t_user u where u.loginNumber = #{loginNumber}
+    </select>
+    <insert id="zhuceuser" parameterType="com.jk.model.UserBean">
+        insert into t_user(loginNumber,password) values (#{loginNumber},#{password})
+    </insert>
+    <!-- 修改：回显 -->
+    <select id="queryUserById" parameterType="int" resultType="com.jk.model.UserBean">
+		select u.*,group_concat(ur.roleid) roleid from t_user u
+			left join t_user_role ur on u.id = ur.userid
+			 where u.id=#{userId}
+			 group by u.id
+	</select>
+    <!-- 根据pid查询地区的数据 -->
+    <select id="queryArea" parameterType="int" resultType="com.jk.model.AreaBean">
+		select * from t_area a where a.pid=#{pid}
+	</select>
+    <!-- 根据pid查询部门子节点 -->
+    <select id="queryDeptByPid" parameterType="int" resultType="com.jk.model.DeptBean">
+		select d.id,d.text,d.pid from t_dept d where d.pid=#{pid}
+	</select>
+    <!-- 新增用户 -->
+    <insert id="addUser" parameterType="com.jk.model.UserBean" useGeneratedKeys="true" keyProperty="id">
+		insert into t_user(name,password,loginNumber,birth,email,sex,detail,headImg,deptid,province,city)
+		values(#{name},#{password},#{loginNumber},#{birth},#{email},
+		#{sex},#{detail},#{headImg},#{deptid},#{province},#{city})
+	</insert>
+    <!-- 修改用户 -->
+    <update id="updateUser" parameterType="com.jk.model.UserBean">
+		update t_user u set u.name=#{name},u.password=#{password},u.loginNumber=#{loginNumber},u.email=#{email},
+			u.birth=#{birth},u.sex=#{sex},u.detail=#{detail},u.headImg=#{headImg},u.deptid=#{deptid},
+			u.province=#{province},u.city=#{city}
+			where u.id=#{id}
+	</update>
+    <insert id="addUserRole">
+        insert into t_user_role(userid,roleid) values
+        <foreach collection="arrId" item="roleid" separator=",">
+            (#{userid},#{roleid})
+        </foreach>
+    </insert>
+    <!-- 根据用户id删除用户角色中间表数据 -->
+    <delete id="deleteUserRole" parameterType="int">
+		delete from t_user_role where userid=#{id}
+	</delete>
+</mapper>

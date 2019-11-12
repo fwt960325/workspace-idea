@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="springboot-highcharts" />
+        <module name="dubbo-provider" />
+        <module name="dubbo-consumer" />
+        <module name="springboot-solr" />
+        <module name="springboot-shiro-provider" />
+        <module name="springboot-dubbo-provider-anntion" />
+        <module name="springboot-shiro-consumer" />
+        <module name="springboot-deom" />
+        <module name="springboot-dubbo-consumer-anntion" />
+        <module name="dubboapi" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="springboot-highchart" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="dubbo-consumer" options="-parameters" />
+      <module name="dubbo-provider" options="-parameters" />
+      <module name="springboot-deom" options="-parameters" />
+      <module name="springboot-dubbo-consumer-anntion" options="-parameters" />
+      <module name="springboot-dubbo-provider-anntion" options="-parameters" />
+      <module name="springboot-highchart" options="-parameters" />
+      <module name="springboot-highcharts" options="-parameters" />
+      <module name="springboot-shiro-consumer" options="-parameters" />
+      <module name="springboot-shiro-provider" options="-parameters" />
+      <module name="springboot-solr" options="-parameters" />
+    </option>
+  </component>
+</project>

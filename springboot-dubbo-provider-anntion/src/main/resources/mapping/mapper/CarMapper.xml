@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.mapper.CarMapper" >
+    <select id="queryTwo" resultType="int">
+        select * from t_car where carId in
+        <foreach collection="id" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+    </select>
+    <insert id="addTwo" parameterType="com.jk.model.Car">
+        insert into t_car (carName,carPrice,carTime) values
+        <foreach collection="list" item="l" separator=",">
+            (#{l.carName},#{l.carPrice},#{l.carTime})
+        </foreach>
+    </insert>
+</mapper>

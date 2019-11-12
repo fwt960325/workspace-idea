@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 引入jquery.js文件 -->
+    <script type="text/javascript" src="../js/jquery-easyui-1.5/jquery.min.js"></script>
+    <!-- 引入easyui的js文件 -->
+    <script type="text/javascript" src="../js/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+    <!-- 引入easyui的中文js文件 -->
+    <script type="text/javascript" src="../js/jquery-easyui-1.5/locale/easyui-lang-zh_CN.js"></script>
+
+    <!-- 引入easyui的css文件 -->
+    <link rel="stylesheet" href="../js/jquery-easyui-1.5/themes/default/easyui.css">
+    <!-- 引入easyui图标的css文件 -->
+    <link rel="stylesheet" href="../js/jquery-easyui-1.5/themes/icon.css">
+
+    <!-- 引入uploadify的css、js -->
+    <link type="text/css" rel="stylesheet" href="../js/uploadify/uploadify.css">
+    <script type="text/javascript" src="../js/uploadify/jquery.uploadify.min.js"></script>
+</head>
+<body>
+<div id="tools">
+    用户名:<input class="easyui-textbox" id="userName">
+    <a href="javascript:searchUser()" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">搜索</a>
+    <a href="javascript:openAdd()" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
+</div>
+<!-- 定义新增的div -->
+<div id="userDialog" class="easyui-dialog" data-options="closed:true,width:500,height:400,modal:true,buttons:'#buttons'">
+    <form id="userForm" method="post">
+        <input name="id" style="display:none">
+        <table>
+            <tr>
+                <td>姓名</td>
+                <td><input class="easyui-textbox" name="name"></td>
+            </tr>
+            <tr>
+                <td>账号</td>
+                <td><input class="easyui-textbox" name="loginNumber"></td>
+            </tr>
+            <tr>
+                <td>密码</td>
+                <td><input class="easyui-textbox" name="password"></td>
+            </tr>
+            <tr>
+                <td>性别</td>
+                <td>
+                    <input type="radio" value="1" name="sex"/>男
+                    <input type="radio" value="2" name="sex"/>女
+                </td>
+            </tr>
+            <tr>
+                <td>生日</td>
+                <td><input class="easyui-datebox" name="birth"></td>
+            </tr>
+            <tr>
+                <td>邮箱</td>
+                <td><input class="easyui-textbox" name="email"></td>
+            </tr>
+            <tr>
+                <td>部门</td>
+                <td><input class="easyui-combotree" name="deptid" id="dept" data-options="width:180"></td>
+            </tr>
+            <tr>
+                <td>角色</td>
+                <td><input class="easyui-combobox" name="roleid" id="role" data-options="width:180"></td>
+            </tr>
+            <tr>
+                <td>简介</td>
+                <td>
+                    <input class="easyui-textbox" name="detail" data-options="multiline:true,height:100">
+                </td>
+            </tr>
+            <tr>
+                <td>头像</td>
+                <td>
+                    <img src="" width="50px" height="50px" id="add_img">
+                    <input type="file" id="uploadImg">
+                    <input style="display:none" name="headImg" id="hideImg">
+                    <div id="fileQueue"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>地区</td>
+                <td>
+                    省：<input id="province" class="easyui-combobox" name="province">
+                    -
+                    市：  <input id="city" class="easyui-combobox" name="city">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<!-- 定义对话框的按钮 -->
+<div id="buttons">
+    <a href="javascript:saveUser()" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true">确定</a>
+    <a href="javascript:closeDialog()" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true">取消</a>
+</div>
+    <table id="userTable"></table>
+</body>
+<script>
+    $(function(){
+        initUserTable();//初始化用户表格
+    })
+    //初始化角色的下拉列表
+    function initRole(){
+        $("#role").combobox({
+            url:"../queryRole",
+            valueField:"id",
+            textField:"name",
+            multiple:true
+        })
+    }
+
+    function initUserTable(){
+        $("#userTable").datagrid({
+            url:"../queryUserPage",
+            columns:[
+                [{field:"checkbox",checkbox:true},
+                {field:"id",title:"id"},
+                {field:"name",title:"用户名"},
+                {field:"loginNumber",title:"登录账号"},
+                {field:"email",title:"邮箱"},
+                {field:"birth",title:"生日"},
+                {field:"sex",title:"性别",formatter:function(value,row,index){
+                        return value==1?"男":value==2?"女":"";
+                    }},
+                {field:"detail",title:"简介"},
+                {field:"headImg",title:"头像",formatter:function(value,row,index){
+                        return "<img src='"+value+"' width='50px' height='50px'>";
+                    }},
+                {field:"deptName",title:"部门"},
+                {field:"roleName",title:"角色"},
+                {field:"proName",title:"地区",formatter:function(value,row,index){
+                        return value +"-"+row.cityName;
+                    }},
+                {field:"tool",title:"操作",formatter:function(value,row,index){
+                        var str = "<a href='javascript:openUpdate("+row.id+")'>修改</a>";
+                        return str;
+                    }}
+            ]
+            ],
+            pagination:true,
+            pageList:[2,4,6,8],
+            pageSize:2,
+            pageNumber:1,
+            fit:true,
+            toolbar:"#tools"
+        })
+    }
+    //打开修改弹框：回显表单数据
+    function openUpdate(userId){
+        $.ajax({
+            url:"../queryUserById",
+            type:"post",
+            data:{userId:userId},
+            success:function(data){
+                initDept();//加载部门树
+                initPro();//初始化省的数据
+                initRole();//初始化角色数据
+                //回显表单数据
+                $("#userForm").form("load",data);
+                $("#add_img").prop("src",data.headImg);//回显图片
+                //打开弹框
+                $("#userDialog").dialog({
+                    closed:false,
+                    title:'修改用户'
+                });
+            }
+        })
+    }
+
+    //初始化省的数据
+    function initPro(){
+        $("#province").combobox({
+            url:"../queryArea?pid=0",
+            valueField:"id",
+            textField:"name",
+            onChange:function(newValue,oldValue){
+                //加载市的数据
+                $("#city").combobox({
+                    url:"../queryArea?pid="+newValue,
+                    valueField:"id",
+                    textField:"name"
+                })
+            }
+        })
+    }
+    //获取部门的数据
+    function initDept(){
+        $("#dept").combotree({
+            url:"../queryDept"
+        })
+    }
+    //保存用户
+    function saveUser(){
+        $("#userForm").form("submit",{
+            url:"../addUser",
+            success:function(){
+                //关闭弹框
+                closeDialog();
+                //刷新表格
+                $("#userTable").datagrid("load")
+            }
+        });
+    }
+
+    //打开新增弹框
+    function openAdd(){
+        //清除表单缓存
+        $("#userForm").form("reset");
+        //清除市的下拉列表
+        $("#city").combobox("loadData",[]);
+        //清除图片缓存
+        $("#add_img").prop("src","");
+        initDept();//加载部门树
+        initPro();//初始化省的数据
+        initRole();//初始化角色
+        $("#userDialog").dialog({
+            closed:false,
+            title:'新增用户'
+        });
+    }
+    //关闭新增弹框
+    function closeDialog(){
+        $("#userDialog").dialog("close");
+    }
+</script>
+</html>
